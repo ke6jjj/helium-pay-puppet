@@ -1,0 +1,99 @@
+#!/usr/local/bin/bash
+
+json_post() {
+	curl -s --header "Content-Type: application/json" \
+		--request POST \
+		--data "$1" \
+		http://localhost:4467/ | jq .result
+}
+
+random_id() {
+	echo "$(( $RANDOM * 65536 + $RANDOM ))"
+}
+
+rpc_build() {
+	echo '{"jsonrpc":"2.0","id":"'$( random_id )'","method":"'"$1"'","params":'"$2"'}'
+}
+
+create_wallet() {
+	password=$1
+	json_post "$( rpc_build wallet_create '{"password":"'"$password"'"}' )"
+}
+
+list_wallets() {
+	json_post "$( rpc_build wallet_list '{}' )"
+}
+
+wallet_is_locked() {
+	address=$1
+	json_post "$( rpc_build wallet_is_locked '{"address":"'"$address"'"}' )"
+}
+
+account_get() {
+	address=$1
+	json_post "$( rpc_build account_get '{"address":"'"$address"'"}' )"
+}
+
+wallet_import() {
+	password=$1
+	path=$2
+	json_post "$( rpc_build wallet_import '{"password":"'"$password"'","path":"'"$path"'"}' )"
+}
+
+wallet_unlock() {
+	address=$1
+	password=$2
+	json_post "$( rpc_build wallet_unlock '{"password":"'"$password"'","address":"'"$address"'"}' )"
+}
+
+wallet_pay() {
+	address=$1
+	payee=$2
+	bones=$3
+	json_post "$( rpc_build wallet_pay '{"address":"'"$address"'","payee":"'"$payee"'","bones":'"$bones"'}' )"
+}
+
+wallet_pay_with_nonce() {
+	address=$1
+	payee=$2
+	bones=$3
+	nonce=$4
+	json_post "$( rpc_build wallet_pay '{"address":"'"$address"'","payee":"'"$payee"'","bones":'"$bones"',"nonce":'"$nonce"'}' )"
+}
+
+wallet_nonce() {
+	address=$1
+
+	account_get $address | jq .nonce
+}
+	
+#wallet_1=$( create_wallet 00000000 )
+#list_wallets
+#account_get "1aSwvNHran9UgK9wd1T6dHdURoFn4u8g5jbUW7TGznw2UYw1tHe"
+#account_get "1abzzfUuiJMnqd3tENDLVCfdD8itzSq873frZKjP3pZsoYJfjer"
+#wallet_import "" $PWD/testnet_validator_4a.key
+#wallet_import "" $PWD/mainnet_node_test.key
+#account_get "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" | jq .nonce
+#wallet_unlock "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" ""
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+#wallet_pay "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000
+
+wallet_unlock "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" ""
+
+nonce=$( wallet_nonce "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" )
+i=0
+while [ $i -lt 20 ]; do
+	next_nonce=$(( $nonce + 1 ))
+	wallet_pay_with_nonce "1aoqnJaPrSi4LjQBsnxo8XoeXLSBs5zgNQ7qYWES31aRUkEYpkZ" "1bWcLkgT9SxYWKdRmoEQs5A5JAFMTT31GszZkeATGb6WKivyQiV" 10000 $nonce
+	nonce=$next_nonce
+	i=$(( $i + 1 ))
+done
